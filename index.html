@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070d19">
+    <title>EarthTrend AI | NASA Climate Intelligence</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+<div class="app-shell">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">E</div>
+            <div>
+                <h2>EARTH<span>TREND</span></h2>
+                <small>AI CLIMATE INTELLIGENCE</small>
+            </div>
+        </div>
+
+        <div class="nav-label">WORKSPACE</div>
+        <nav>
+            <a class="nav-link active" href="#overview">◈ <span>Overview</span></a>
+            <a class="nav-link" href="#analytics">⌁ <span>Climate Trends</span></a>
+            <a class="nav-link" href="#insights">✧ <span>AI Insights</span></a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="nasa-card">
+                <div class="nasa-symbol">NASA</div>
+                <strong>Powered by NASA data</strong>
+                <p>Earth observation for a better understanding of our planet.</p>
+                <a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener">Explore NASA POWER ↗</a>
+            </div>
+            <div class="version">EARTH TREND AI · PROTOTYPE 1.0</div>
+        </div>
+    </aside>
+
+    <main class="main-content" id="overview">
+
+        <header class="topbar">
+            <div class="breadcrumb">EARTH OBSERVATION <span>/</span> DASHBOARD</div>
+            <div class="system-status">
+                <span class="status-dot"></span>
+                NASA DATA CONNECTION
+            </div>
+        </header>
+
+        <section class="hero">
+            <div>
+                <div class="eyebrow">PLANETARY CLIMATE MONITORING</div>
+                <h1>Understand our planet.<br><span>Discover its trends.</span></h1>
+                <p>Explore historical environmental data and uncover the patterns shaping our changing planet.</p>
+            </div>
+            <div class="earth-visual">
+                <div class="orbit orbit-one"></div>
+                <div class="orbit orbit-two"></div>
+                <div class="earth-glow">🌍</div>
+                <span class="earth-caption">EARTH / 01</span>
+            </div>
+        </section>
+
+        <section class="control-panel">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">DATA EXPLORER</span>
+                    <h2>Configure your analysis</h2>
+                </div>
+                <span class="data-badge">● REAL NASA DATA</span>
+            </div>
+
+            <div class="filters">
+                <label>
+                    <span>PRIMARY LOCATION</span>
+                    <select id="location">
+                        <option value="33.6947,-7.3850">Mohammedia area, Morocco</option>
+                        <option value="34.03,-5.00">Fes, Morocco</option>
+                        <option value="33.89,-5.55">Meknes, Morocco</option>
+                        <option value="33.57,-7.59">Casablanca, Morocco</option>
+                        <option value="34.02,-6.84">Rabat, Morocco</option>
+                        <option value="31.63,-8.00">Marrakech, Morocco</option>
+                        <option value="30.42,-9.60">Agadir, Morocco</option>
+                    </select>
+                </label>
+
+                <label>
+                    <span>COMPARE WITH (OPTIONAL)</span>
+                    <select id="comparisonLocation">
+                        <option value="">None (Single Analysis)</option>
+                        <option value="33.57,-7.59">Casablanca, Morocco</option>
+                        <option value="34.02,-6.84">Rabat, Morocco</option>
+                        <option value="31.63,-8.00">Marrakech, Morocco</option>
+                        <option value="34.03,-5.00">Fes, Morocco</option>
+                        <option value="33.89,-5.55">Meknes, Morocco</option>
+                        <option value="30.42,-9.60">Agadir, Morocco</option>
+                    </select>
+                </label>
+
+                <label>
+                    <span>VARIABLE</span>
+                    <select id="variable">
+                        <option value="T2M">Air Temperature (°C)</option>
+                        <option value="PRECTOTCORR">Precipitation (mm)</option>
+                    </select>
+                </label>
+
+                <label>
+                    <span>START</span>
+                    <input type="number" id="startYear" value="2001" min="1981" max="2026">
+                </label>
+
+                <label>
+                    <span>END</span>
+                    <input type="number" id="endYear" value="2025" min="1981" max="2026">
+                </label>
+
+                <button id="analyzeBtn" class="analyze-btn" onclick="analyzeData()">
+                    <span>↗</span> Analyze
+                </button>
+            </div>
+
+            <div id="message" class="message">
+                Select your parameters and start your analysis.
+            </div>
+        </section>
+
+        <!-- Interactive Map Section -->
+        <section class="section-block">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">GEOSPATIAL VIEW</span>
+                    <h2>Interactive station map</h2>
+                </div>
+                <span class="chart-tag">LEAFLET · NASA STATIONS</span>
+            </div>
+            <div class="chart-card">
+                <div id="map" class="map-area"></div>
+            </div>
+        </section>
+
+        <section class="section-block">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">LIVE ANALYTICS</span>
+                    <h2>Climate indicators</h2>
+                </div>
+                <span class="period-label" id="periodLabel">2001 — 2025</span>
+            </div>
+
+            <div class="kpi-grid">
+                <article class="kpi-card">
+                    <div class="kpi-top">
+                        <span>AVERAGE TEMPERATURE</span>
+                        <span class="kpi-icon">◉</span>
+                    </div>
+                    <div class="kpi-value" id="avgTemp">-- <small>°C</small></div>
+                    <p>Mean daily air temperature</p>
+                </article>
+
+                <article class="kpi-card">
+                    <div class="kpi-top">
+                        <span>TOTAL PRECIPITATION</span>
+                        <span class="kpi-icon">◌</span>
+                    </div>
+                    <div class="kpi-value" id="totalRain">-- <small>mm</small></div>
+                    <p>Accumulated precipitation</p>
+                </article>
+
+                <article class="kpi-card">
+                    <div class="kpi-top">
+                        <span>WARMEST MONTH</span>
+                        <span class="kpi-icon">☼</span>
+                    </div>
+                    <div class="kpi-value compact" id="warmestMonth">--</div>
+                    <p>Highest monthly average temperature</p>
+                </article>
+
+                <article class="kpi-card">
+                    <div class="kpi-top">
+                        <span>DATA RECORDS</span>
+                        <span class="kpi-icon">▤</span>
+                    </div>
+                    <div class="kpi-value" id="recordCount">--</div>
+                    <p>Valid daily observations</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-block" id="analytics">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">HISTORICAL OBSERVATIONS</span>
+                    <h2 id="chartTitle">Temperature evolution</h2>
+                </div>
+                <span class="chart-tag">NASA POWER · MONTHLY</span>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div>
+                        <strong id="chartLocation">Mohammedia area, Morocco</strong>
+                        <p>Monthly environmental measurements</p>
+                    </div>
+                    <span class="chart-legend"><i></i><span id="legendLabel">Temperature</span></span>
+                </div>
+                <div id="climateChart" class="chart-area">
+                    <div class="chart-placeholder">Your climate visualization will appear here.</div>
+                </div>
+                <div class="chart-footer">
+                    <span>DATA SOURCE: NASA POWER</span>
+                    <span>PRELIMINARY VISUALIZATION</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-block" id="insights">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">SCIENTIFIC INTERPRETATION</span>
+                    <h2>EarthTrend AI insights</h2>
+                </div>
+                <span class="ai-badge">✧ AI MODULE</span>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">✧</div>
+                <div>
+                    <strong>Statistical analysis integration</strong>
+                    <p id="insightText">
+                        Statistical trends, anomaly detection and AI-generated explanations will appear here when the team modules are connected.
+                    </p>
+                    <span class="pending-label">ACTIVE TREND ANALYSIS</span>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <span>EARTH TREND AI © 2026</span>
+            <span>DATA: NASA POWER · SCIENTIFIC ANALYSIS IN PROGRESS</span>
+        </footer>
+
+    </main>
+</div>
+</body>
+</html>
