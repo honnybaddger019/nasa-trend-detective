@@ -1,0 +1,80 @@
+# EarthTrend AI - security pipeline (Role 6).
+# Runs on every push and pull request: secrets scan, code scan (SAST),
+# dependency scan (SCA), security tests and container image scan.
+#
+# Feature freeze (H18): set the repository variable SECURITY_STRICT=false
+# (Settings > Secrets and variables > Actions > Variables). Bandit, pip-audit
+# and Trivy then report without blocking; Gitleaks and the tests still block.
+#
+# Every action is pinned to a full commit SHA (supply-chain protection).
+name: security
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secrets:
+    name: Secrets scan (Gitleaks)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # full history: a secret deleted later is still leaked
+          persist-credentials: false
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  code:
+    name: SAST, dependencies and security tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Bandit (SAST, medium and high findings)
+        continue-on-error: ${{ vars.SECURITY_STRICT == 'false' }}
+        run: bandit -r . -x ./tests,./static,./.venv,./venv -ll
+      - name: pip-audit (known vulnerable dependencies)
+        continue-on-error: ${{ vars.SECURITY_STRICT == 'false' }}
+        run: pip-audit -r requirements.txt
+      - name: Security tests (validation, rate limiting, headers, injection guard)
+        run: pytest tests/role6_security -q
+
+  container:
+    name: Container image scan (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build the image
+        run: docker build -t earthtrend:ci .
+      - name: Trivy (critical and high, with a fix available)
+        continue-on-error: ${{ vars.SECURITY_STRICT == 'false' }}
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: earthtrend:ci
+          version: v0.76.2
+          scanners: vuln
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"

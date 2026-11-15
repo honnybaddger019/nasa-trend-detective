@@ -1,0 +1,10 @@
+# Role 6 - runtime dependencies of the security layer (pinned, checked by pip-audit).
+# Added to the team's requirements.txt with one line:  -r requirements-security.txt
+fastapi==0.163.0
+uvicorn==0.54.0
+pydantic==2.14.3
+slowapi==0.1.10
+httpx==0.28.1
+requests==2.34.2
+# Only used when LLM_PROVIDER=anthropic (official Claude SDK).
+anthropic==2.8.0
