@@ -14,7 +14,7 @@ services:
       - key: APP_ENV
         value: production
       - key: APP_MODULE
-        value: server:app
+        value: api.server:app
       # Public URL of the site, e.g. https://earthtrend-ai.onrender.com (comma separated if several).
       - key: ALLOWED_ORIGINS
         sync: false
@@ -31,6 +31,9 @@ services:
         value: 30/minute
       - key: RATE_LIMIT_COMPUTE
         value: 30/minute
+      # Member 4 routes receive whole time series (up to 1200 monthly rows).
+      - key: MAX_BODY_BYTES
+        value: "65536"
       - key: LLM_PROVIDER
         sync: false
       - key: LLM_MODEL

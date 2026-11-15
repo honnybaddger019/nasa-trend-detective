@@ -67,6 +67,8 @@ pip install pre-commit && pre-commit install
 
 ## Step 4 - Plug security.py into server.py (with Member 4, 15 min)
 
+**Status (2026-11-15): done.** Member 4's backend is `api/server.py` (run with `uvicorn api.server:app`). It keeps Member 4's routes and response keys, adds `install_security`, `@limit_compute` on `/forecast`, `/backtest`, `/anomalies`, `@limit_llm` on `/explain` and `/ask`, strict bounded models, the injection guard and the output filter. `/explain` and `/ask` now also return a `source` field (`llm`, `guard` or `fallback`). It imports Member 4's `ai` package (`ai/forecasting.py`, `ai/anomalies.py`, `ai/explanation.py`): Member 4 pushes `ai/` and adds its dependencies to `requirements.txt`, but does not push another copy of `api/server.py`. Tests: `tests/role6_security/test_api_server.py` (the `ai` package is stubbed). The generic pattern below stays as a reference.
+
 Member 4 owns `server.py`. The changes are:
 
 ```python
@@ -97,7 +99,7 @@ Rules:
 - Do not pass `temperature` to Claude models: current models reject it with a 400 error. `llm_client.py` already handles this.
 - `examples/demo_server.py` is the complete working reference.
 
-**Done when:** `pytest tests/role6_security -q` still passes and `./scripts/smoke.sh` passes against `uvicorn server:app --port 8000`.
+**Done when:** `pytest tests/role6_security -q` still passes and `./scripts/smoke.sh` passes against `uvicorn api.server:app --port 8000`.
 
 ## Step 5 - Notes for Members 2 and 5 (5 min)
 

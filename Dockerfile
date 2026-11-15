@@ -8,7 +8,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     APP_ENV=production \
-    APP_MODULE=server:app \
+    APP_MODULE=api.server:app \
+    MAX_BODY_BYTES=65536 \
     PORT=8000
 
 # Security updates of the Debian base packages (the pinned base image can be
