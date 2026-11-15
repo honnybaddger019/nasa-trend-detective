@@ -1,0 +1,8 @@
+# Local secrets scan BEFORE the commit exists (the CI scan runs after the push,
+# when a leaked key is already public). Install once per laptop:
+#   pip install pre-commit && pre-commit install
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks

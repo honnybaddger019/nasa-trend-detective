@@ -1,0 +1,47 @@
+# Render Blueprint - EarthTrend AI web service (Role 6).
+# Secrets are NOT stored here: values marked "sync: false" are typed once in
+# the Render dashboard when the Blueprint is created.
+services:
+  - type: web
+    name: earthtrend-ai
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_MODULE
+        value: api.server:app
+      # Public URL of the site, e.g. https://earthtrend-ai.onrender.com (comma separated if several).
+      - key: ALLOWED_ORIGINS
+        sync: false
+      # Number of proxies in front of the app that append to X-Forwarded-For.
+      # Confirm it after the first deployment with DEBUG_CLIENT_IP (see INTEGRATION.md, step 6).
+      - key: TRUSTED_PROXY_HOPS
+        value: "1"
+      - key: DEBUG_CLIENT_IP
+        value: "true"
+      - key: RATE_LIMIT_LLM
+        value: 10/minute
+      # Keep BELOW the free LLM tier quota (requests per minute).
+      - key: RATE_LIMIT_LLM_GLOBAL
+        value: 30/minute
+      - key: RATE_LIMIT_COMPUTE
+        value: 30/minute
+      # Member 4 routes receive whole time series (up to 1200 monthly rows).
+      - key: MAX_BODY_BYTES
+        value: "65536"
+      - key: LLM_PROVIDER
+        sync: false
+      - key: LLM_MODEL
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      # Member 4: ai/explanation.py calls Groq directly with these two values.
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-20b

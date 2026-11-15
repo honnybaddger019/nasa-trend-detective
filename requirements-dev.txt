@@ -1,0 +1,4 @@
+# Role 6 - tools used by the security pipeline and the test suite.
+pytest==9.2.0
+bandit==1.9.4
+pip-audit==2.10.1
